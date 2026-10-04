@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শুভ জন্মদিন সত্যবতী</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #03030a; 
+            color: #ffffff; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #canvas-container { 
+            position: relative; 
+            width: 100vw; 
+            height: 65vh; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas { display: block; }
+
+        .message-section { 
+            width: 100%;
+            max-width: 650px;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        h1 { 
+            color: #ffd700; 
+            font-size: 2.5rem; 
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(255,215,0,0.4); 
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        #typing-text { font-size: 1.15rem; line-height: 1.6; color: #ccccd9; margin-bottom: 25px; min-height: 50px; }
+        .secret-note { 
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #ff8585; 
+            border-top: 1px dashed rgba(255, 133, 133, 0.4); 
+            padding-top: 20px; 
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        .secret-note.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <!-- আপনার ফোল্ডারের ফাইলনেম অনুযায়ী অডিও মডিউল -->
+    <audio id="bg-music" loop>
+        <source src="mls.mp3" type="audio/mp3">
+    </audio>
+
+    <div id="canvas-container">
+        <canvas id="particleCanvas"></canvas>
+    </div>
+
+    <div class="message-section">
+        <h1 id="main-title">শুভ জন্মদিন সত্যবতী 🌸🥰</h1>
+        <div id="typing-text"></div>
+        <div class="secret-note" id="final-note">
+            "তোমার ঘরের সেই জল ভরা লাভ বল আর চন্দন-কাঠের সুগন্ধ আজও আমার বাতাসে ঘোরে। তোমার এই ‘ছিটাল ব্যক্তি’ অন্য কারও হয়ে যায়নি সোনা পাগলির প্রাণ প্রিয়, সে আজও তোমারই আত্মার পরম অংশ হয়ে তোমার জন্য নিজের ভাগ্য এক অনন্য উচ্চতায় লিখে চলেছে... রাধে রাধে!" 🎂🦚✨
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        const audio = document.getElementById('bg-music');
+
+        // ক্যানভাস সাইজ ইনিশিয়ালি ফিক্সড করা হলো (Fixing the Zero-Size Bug)
+        canvas.width = window.innerWidth || 800;
+        canvas.height = (window.innerHeight * 0.65) || 500;
+
+        let particles = [];
+        let heartPoints = [];
+        let imageParticles = [];
+        let stage = 0; 
+        let timer = 0;
+        let brushProgress = 0;
+
+        const targetImg = new Image();
+
+        function calculateHeartPoints() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) / 40;
+            for (let angle = 0; angle < Math.PI * 2; angle += 0.015) {
+                const x = 16 * Math.pow(Math.sin(angle), 3);
+                const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle));
+                heartPoints.push({ tx: centerX + x * scale, ty: centerY + y * scale });
+            }
+        }
+
+        function sampleImage() {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // ব্রাউজার বাগ বাইপাস করতে ছবির ফিক্সড স্যাম্পলিং সাইজ ৩০০ পিক্সেল লক করা হলো
+            const imgSize = 300; 
+            tempCanvas.width = imgSize;
+            tempCanvas.height = imgSize;
+            
+            tempCtx.drawImage(targetImg, 0, 0, imgSize, imgSize);
+            const imgData = tempCtx.getImageData(0, 0, imgSize, imgSize).data;
+            
+            const startX = (canvas.width - imgSize) / 2;
+            const startY = (canvas.height - imgSize) / 2;
+            
+            for (let y = 0; y < imgSize; y += 4) { // ৪ পিক্সেল স্যাম্পলিং ফর আল্ট্রা-স্মুথ মোবাইল পারফরম্যান্স
+                for (let x = 0; x < imgSize; x += 4) {
+                    const index = (y * imgSize + x) * 4;
+                    const alpha = imgData[index + 3];
+                    if (alpha > 128) {
+                        const r = imgData[index];
+                        const g = imgData[index + 1];
+                        const b = imgData[index + 2];
+                        imageParticles.push({ tx: startX + x, ty: startY + y, color: `rgb(${r},${g},${b})` });
+                    }
+                }
+            }
+        }
+
+        class Particle {
+            constructor(tx, ty, color = null) {
+                let r = Math.random() * Math.max(canvas.width, canvas.height) + 200;
+                let theta = Math.random() * Math.PI * 2;
+                this.x = canvas.width / 2 + Math.cos(theta) * r;
+                this.y = canvas.height / 2 + Math.sin(theta) * r;
+                
+                this.tx = tx; this.ty = ty;
+                this.size = Math.random() * 1.5 + 1.2;
+                this.color = color || `hsl(${Math.random() * 20 + 340}, 100%, 60%)`;
+                this.vx = 0; this.vy = 0;
+                this.ease = 0.04; this.friction = 0.90;
+            }
+            update() {
+                if (stage === 0) {
+                    let cx = canvas.width / 2; let cy = canvas.height / 2;
+                    let dx = this.x - cx; let dy = this.y - cy;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    let angle = Math.atan2(dy, dx) + 0.035;
+                    this.x = cx + Math.cos(angle) * (dist * 0.985);
+                    this.y = cy + Math.sin(angle) * (dist * 0.985);
+                } else {
+                    this.vx += (this.tx - this.x) * this.ease;
+                    this.vy += (this.ty - this.y) * this.ease;
+                    this.vx *= this.friction; this.vy *= this.friction;
+                    this.x += this.vx; this.y += this.vy;
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            heartPoints.forEach(pt => { particles.push(new Particle(pt.tx, pt.ty)); });
+        }
+
+        function typeWriter(text, i, cb) {
+            if (i < text.length) {
+                document.getElementById("typing-text").innerHTML += text.charAt(i);
+                setTimeout(() => typeWriter(text, i + 1, cb), 40);
+            } else if (cb) { cb(); }
+        }
+
+        function drawBrushFilledHeart() {
+            if (brushProgress <= 0) return;
+            ctx.save(); ctx.beginPath();
+            const centerX = canvas.width / 2; const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) / 40;
+            
+            for (let angle = 0; angle < Math.PI * 2 * brushProgress; angle += 0.01) {
+                const x = 16 * Math.pow(Math.sin(angle), 3);
+                const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle));
+                if (angle === 0) ctx.moveTo(centerX + x * scale, centerY + y * scale);
+                else ctx.lineTo(centerX + x * scale, centerY + y * scale);
+            }
+            ctx.lineWidth = 40; ctx.strokeStyle = "rgba(255, 0, 51, 0.4)"; ctx.stroke();
+            ctx.fillStyle = "rgba(255, 0, 51, 0.8)"; ctx.fill(); ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (stage === 2 || stage === 1) { drawBrushFilledHeart(); }
+            particles.forEach(p => { p.update(); p.draw(); });
+            timer++;
+
+            if (stage === 0 && timer > 900) { stage = 1; timer = 0; }
+            if (stage === 1 && timer > 900) { stage = 2; timer = 0; }
+
+            if (stage === 2) {
+                if (brushProgress < 1) brushProgress += (1 / 780);
+                else if (timer > 780) { 
+                    stage = 3; timer = 0;
+                    let diff = imageParticles.length - particles.length;
+                    if (diff > 0) {
+                        for (let i = 0; i < diff; i++) {
+                            let pt = heartPoints[Math.floor(Math.random() * heartPoints.length)];
+                            particles.push(new Particle(pt.tx, pt.ty));
+                        }
+                    }
+                    for (let i = 0; i < particles.length; i++) {
+                        if (imageParticles[i]) {
+                            particles[i].tx = imageParticles[i].tx;
+                            particles[i].ty = imageParticles[i].ty;
+                            particles[i].color = imageParticles[i].color;
+                            particles[i].size = 1.5;
+                            particles[i].ease = 0.025;
+                        } else { particles[i].size = 0; }
+                    }
+                }
+            }
+
+            if (stage === 3 && timer > 1200) {
+                stage = 4;
+                document.getElementById('main-title').style.opacity = 1;
+                setTimeout(() => {
+                    typeWriter("Realities change, distances grow, but the cosmic signatures written by the universe can never be erased.", 0, () => {
+                        document.getElementById('final-note').classList.add('show');
+                    });
+                }, 1000);
+            }
+            if (stage < 4) { requestAnimationFrame(animate); }
+        }
+
+        function activateMusic() {
+        }
