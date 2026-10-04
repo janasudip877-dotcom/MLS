@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#03030a">
+    <title>শুভ জন্মদিন সত্যবতী</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --night: #03030a;
+            --gold: #ffd875;
+            --crimson: #ff0033;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-width: 320px;
+            background: var(--night);
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            background:
+                radial-gradient(ellipse at 50% 32%, rgba(43, 10, 27, 0.32), transparent 58%),
+                var(--night);
+            color: #fff;
+            font-family: "Segoe UI", "Noto Sans Bengali", Arial, sans-serif;
+        }
+
+        .presentation {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stage {
+            position: relative;
+            width: 100%;
+            height: 65vh;
+            height: 65svh;
+            min-height: 360px;
+            overflow: hidden;
+            isolation: isolate;
+            background:
+                radial-gradient(ellipse at 50% 53%, rgba(255, 0, 51, 0.075), transparent 43%),
+                radial-gradient(ellipse at 50% 45%, rgba(255, 204, 102, 0.035), transparent 66%);
+        }
+
+        .stage::before {
+            position: absolute;
+            z-index: 0;
+            top: 50%;
+            left: 50%;
+            width: min(74vw, 670px);
+            aspect-ratio: 1;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(255, 216, 117, 0.075);
+            border-radius: 50%;
+            box-shadow:
+                0 0 70px rgba(255, 0, 51, 0.08),
+                inset 0 0 70px rgba(255, 216, 117, 0.025);
+            content: "";
+            pointer-events: none;
+        }
+
+        .portrait {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            width: min(40vw, 310px);
+            aspect-ratio: 1;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 216, 117, 0.92);
+            border-radius: 50%;
+            object-fit: cover;
+            opacity: 0;
+            box-shadow:
+                0 0 18px rgba(255, 216, 117, 0.68),
+                0 0 58px rgba(255, 0, 51, 0.36);
+            will-change: opacity;
+            animation: portrait-glow 4.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes portrait-glow {
+            from {
+                box-shadow: 0 0 18px rgba(255, 216, 117, 0.48), 0 0 42px rgba(255, 0, 51, 0.24);
+            }
+            to {
+                box-shadow: 0 0 26px rgba(255, 216, 117, 0.82), 0 0 72px rgba(255, 0, 51, 0.48);
+            }
+        }
+
+        #particleCanvas {
+            position: absolute;
+            z-index: 2;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .intro-hint {
+            position: absolute;
+            z-index: 3;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 216, 117, 0.78);
+            font-size: 0.78rem;
+            letter-spacing: 0.22em;
+            text-align: center;
+            text-transform: uppercase;
+            white-space: nowrap;
+            transition: opacity 700ms ease;
+        }
+
+        .intro-hint::before,
+        .intro-hint::after {
+            display: inline-block;
+            width: 24px;
+            height: 1px;
+            margin: 0 12px 4px;
+            background: linear-gradient(90deg, transparent, rgba(255, 216, 117, 0.7));
+            content: "";
+        }
+
+        .intro-hint::after {
+            transform: scaleX(-1);
+        }
+
+        .intro-hint.hidden {
+            opacity: 0;
+        }
+
+        .message-section {
+            width: min(100% - 36px, 780px);
+            padding: 4px 12px 36px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            color: var(--gold);
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            line-height: 1.35;
+            text-shadow: 0 0 12px rgba(255, 216, 117, 0.55), 0 0 34px rgba(255, 170, 46, 0.25);
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #typing-text {
+            min-height: 3.2em;
+            margin: 0 auto 20px;
+            color: #e1dbe0;
+            font-size: clamp(1rem, 2.8vw, 1.2rem);
+            line-height: 1.75;
+            white-space: pre-line;
+        }
+
+        .secret-note {
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 0, 51, 0.3);
+            color: #ff9aa9;
+            font-size: clamp(1rem, 2.7vw, 1.14rem);
+            font-weight: 500;
+            line-height: 1.85;
+            opacity: 0;
+            text-shadow: 0 0 16px rgba(255, 0, 51, 0.25);
+            transition: opacity 2.4s ease;
+        }
+
+        .secret-note.show {
+            opacity: 1;
+        }
+
+        .message-section::before {
+            display: block;
+            width: 92px;
+            height: 1px;
+            margin: 0 auto 22px;
+            background: linear-gradient(90deg, transparent, rgba(255, 216, 117, 0.72), transparent);
+            content: "";
+            opacity: 0;
+            transition: opacity 1.8s ease;
+        }
+
+        .message-section.revealed::before {
+            opacity: 1;
+        }
+
+        .audio-status {
+            position: fixed;
+            z-index: 3;
+            right: 12px;
+            bottom: 10px;
+            left: 12px;
+            color: rgba(255, 216, 117, 0.82);
+            font-size: 0.76rem;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .stage {
+                height: 58vh;
+                height: 58svh;
+                min-height: 320px;
+            }
+
+            .portrait {
+                width: min(62vw, 260px);
+            }
+
+            .message-section {
+                padding-top: 10px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+            }
+
+            .portrait {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="presentation">
+        <section class="stage" aria-label="Birthday animation">
+            <img class="portrait" id="portrait" src="pagli.jpeg" alt="সত্যবতীর ছবি">
+            <canvas id="particleCanvas" aria-hidden="true"></canvas>
+            <div class="intro-hint" id="intro-hint">Tap anywhere to begin</div>
+        </section>
+
+        <section class="message-section" aria-live="polite">
+            <h1 id="main-title">শুভ জন্মদিন সত্যবতী 🌸🥰</h1>
+            <p id="typing-text"></p>
+            <div class="secret-note" id="final-note">
+                তোমার ঘরের সেই জল ভরা লাভ বল আর চন্দন-কাঠের সুগন্ধ আজও আমার বাতাসে ঘোরে। তোমার এই ‘ছিটাল ব্যক্তি’ অন্য কারও হয়ে যায়নি সোনা পাগলির প্রাণ প্রিয়, সে আজও তোমারই আত্মার পরম অংশ হয়ে তোমার জন্য নিজের ভাগ্য এক অনন্য উচ্চতায় লিখে চলেছে... রাধে রাধে! 🎂🦚✨
+            </div>
+        </section>
+    </main>
+
+    <audio id="bg-music" preload="auto">
+        <source src="mls.mp3" type="audio/mpeg">
+    </audio>
+    <div class="audio-status" id="audio-status" role="status">Tap anywhere to start the 63-second birthday presentation and music.</div>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const DURATION_SECONDS = 63;
+            const DURATION_FRAMES = DURATION_SECONDS * 60;
+            const HEART_START_FRAME = 900;
+            const FILL_START_FRAME = 1800;
+            const EXPLOSION_FRAME = 2580;
+            const MESSAGE_FRAME = 3180;
+            const PARTICLE_COUNT = 560;
+            const HEART_PATH_STEPS = 720;
+            const BRUSH_STROKES = 44;
+            const STAR_COUNT = 96;
+            const HEART_OUTLINE = "#ff3158";
+            const MESSAGE = "Realities change, distances grow,\nbut the cosmic signatures written by the universe\ncan never be erased.";
+
+            const canvas = document.getElementById("particleCanvas");
+            const ctx = canvas.getContext("2d", { alpha: true });
+            const portrait = document.getElementById("portrait");
+            const audio = document.getElementById("bg-music");
+            const title = document.getElementById("main-title");
+            const typingText = document.getElementById("typing-text");
+            const finalNote = document.getElementById("final-note");
+            const messageSection = document.querySelector(".message-section");
+            const introHint = document.getElementById("intro-hint");
+            const audioStatus = document.getElementById("audio-status");
+
+            let particles = [];
+            let heartPath = [];
+            let stars = [];
+            let animationId = 0;
+            let animationStarted = false;
+            let timelineStarted = false;
+            let timelineFrame = 0;
+            let typingTimer = 0;
+            let typingVersion = 0;
+            let explosionTriggered = false;
+            let audioStarting = false;
+            let audioFinished = false;
+            let sceneWidth = 0;
+            let sceneHeight = 0;
+            let heartBounds = { top: 0, bottom: 0, left: 0, right: 0 };
+
+            function resizeCanvas() {
+                const bounds = canvas.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                sceneWidth = Math.max(1, bounds.width);
+                sceneHeight = Math.max(1, bounds.height);
+                canvas.width = Math.round(sceneWidth * dpr);
+                canvas.height = Math.round(sceneHeight * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function heartCoordinate(angle) {
+                const scale = Math.min(sceneWidth * 0.42 / 32, sceneHeight * 0.70 / 30);
+                const x = 16 * Math.pow(Math.sin(angle), 3);
+                const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) -
+                    2 * Math.cos(3 * angle) - Math.cos(4 * angle));
+                return {
+                    x: sceneWidth / 2 + x * scale,
+                    y: sceneHeight / 2 + y * scale
+                };
+            }
+
+            function createHeartPath() {
+                heartPath = [];
+                for (let i = 0; i < HEART_PATH_STEPS; i += 1) {
+                    heartPath.push(heartCoordinate((i / HEART_PATH_STEPS) * Math.PI * 2));
+                }
+                heartBounds = {
+                    top: Math.min(...heartPath.map(point => point.y)),
+                    bottom: Math.max(...heartPath.map(point => point.y)),
+                    left: Math.min(...heartPath.map(point => point.x)),
+                    right: Math.max(...heartPath.map(point => point.x))
+                };
+                stars = Array.from({ length: STAR_COUNT }, () => ({
+                    x: Math.random() * sceneWidth,
+                    y: Math.random() * sceneHeight,
+                    radius: 0.35 + Math.random() * 1.2,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 0.008 + Math.random() * 0.02
+                }));
+            }
+
+            class Particle {
+                constructor(index) {
+                    const angle = (index / PARTICLE_COUNT) * Math.PI * 2;
+                    const radius = Math.min(sceneWidth, sceneHeight) * 0.49;
+                    const target = heartPath[Math.floor(index * HEART_PATH_STEPS / PARTICLE_COUNT)];
+                    this.x = sceneWidth / 2 + Math.cos(angle) * radius;
+                    this.y = sceneHeight / 2 + Math.sin(angle) * radius;
+                    this.px = this.x;
+                    this.py = this.y;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.tx = target.x;
+                    this.ty = target.y;
+                    this.size = 1 + Math.random() * 1.8;
+                    this.opacity = 0.55 + Math.random() * 0.45;
+                    this.hue = 345 + Math.random() * 24;
+                    this.ease = 0.06;
+                    this.friction = 0.90;
+                    this.spin = (Math.random() - 0.5) * 0.02;
+                }
+
+                explode() {
+                    const dx = this.x - sceneWidth / 2;
+                    const dy = this.y - sceneHeight / 2;
+                    const distance = Math.max(1, Math.hypot(dx, dy));
+                    const force = 3.5 + Math.random() * 6.5;
+                    this.vx = (dx / distance) * force + (Math.random() - 0.5) * 2;
+                    this.vy = (dy / distance) * force + (Math.random() - 0.5) * 2;
+                    this.friction = 0.986;
+                }
+
+                update(frame, idle) {
+                    this.px = this.x;
+                    this.py = this.y;
+                    if (idle || frame < HEART_START_FRAME) {
+                        const dx = this.x - sceneWidth / 2;
+                        const dy = this.y - sceneHeight / 2;
+                        const angle = Math.atan2(dy, dx) + this.spin + 0.012;
+                        const radius = Math.hypot(dx, dy) * (idle ? 1 : 0.997);
+                        this.x = sceneWidth / 2 + Math.cos(angle) * radius;
+                        this.y = sceneHeight / 2 + Math.sin(angle) * radius;
+                        return;
+                    }
+
+                    if (frame < EXPLOSION_FRAME) {
+                        this.vx += (this.tx - this.x) * this.ease;
+                        this.vy += (this.ty - this.y) * this.ease;
+                        this.vx *= this.friction;
+                        this.vy *= this.friction;
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        return;
+                    }
+
+                    this.vx *= this.friction;
+                    this.vy *= this.friction;
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    const ageSeconds = (frame - EXPLOSION_FRAME) / 60;
+                    this.opacity = Math.max(0, 1 - ageSeconds / 7.5);
+                    this.size = Math.max(0.15, this.size * 0.998);
+                }
+
+                draw(frame) {
+                    if (this.opacity <= 0) return;
+                    const exploding = frame >= EXPLOSION_FRAME;
+                    ctx.save();
+                    ctx.globalAlpha = this.opacity * (exploding ? 0.42 : 0.28);
+                    ctx.strokeStyle = exploding ? "#ff728d" : "#ff8294";
+                    ctx.lineWidth = Math.max(0.7, this.size * 0.75);
+                    ctx.beginPath();
+                    ctx.moveTo(this.px, this.py);
+                    ctx.lineTo(this.x, this.y);
+                    ctx.stroke();
+                    ctx.globalAlpha = this.opacity;
+                    ctx.fillStyle = exploding ? `hsl(${this.hue}, 100%, 69%)` : HEART_OUTLINE;
+                    ctx.shadowColor = exploding ? "#ff244f" : "#ff0033";
+                    ctx.shadowBlur = exploding ? 15 : 8;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            function initializeParticles() {
+                particles = Array.from({ length: PARTICLE_COUNT }, (_, index) => new Particle(index));
+            }
+
+            function drawAmbientStars(frame) {
+                ctx.save();
+                stars.forEach(star => {
+                    star.phase += star.speed;
+                    const twinkle = 0.2 + (Math.sin(frame * star.speed + star.phase) + 1) * 0.25;
+                    ctx.globalAlpha = twinkle;
+                    ctx.fillStyle = star.phase > Math.PI ? "#ffe5a3" : "#b9c4ff";
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.restore();
+            }
+
+            function traceHeart() {
+                ctx.beginPath();
+                heartPath.forEach((point, index) => {
+                    if (index === 0) ctx.moveTo(point.x, point.y);
+                    else ctx.lineTo(point.x, point.y);
+                });
+                ctx.closePath();
+            }
+
+            function drawHeartOutline() {
+                traceHeart();
+                ctx.save();
+                ctx.strokeStyle = "rgba(255, 45, 89, 0.2)";
+                ctx.lineWidth = 8;
+                ctx.shadowColor = "#ff0033";
+                ctx.shadowBlur = 34;
+                ctx.stroke();
+                ctx.strokeStyle = "rgba(255, 192, 174, 0.78)";
+                ctx.lineWidth = 1.15;
+                ctx.shadowBlur = 10;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            function drawCrimsonFill(progress, opacity = 1) {
+                if (progress <= 0) return;
+                const { top, bottom, left, right } = heartBounds;
+                const strokeProgress = progress * BRUSH_STROKES;
+                const completeStrokes = Math.floor(strokeProgress);
+                const activeProgress = strokeProgress - completeStrokes;
+                const rowHeight = (bottom - top) / BRUSH_STROKES;
+                const strokeWidth = rowHeight * 2.05;
+                const gradient = ctx.createLinearGradient(left, top, right, bottom);
+                gradient.addColorStop(0, "#b8002e");
+                gradient.addColorStop(0.38, "#ff1748");
+                gradient.addColorStop(0.72, "#ff315b");
+                gradient.addColorStop(1, "#c90037");
+
+                ctx.save();
+                ctx.globalAlpha = opacity;
+                traceHeart();
+                ctx.clip();
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = strokeWidth;
+                ctx.shadowColor = "#ff0033";
+                ctx.shadowBlur = 24;
+
+                for (let index = 0; index <= completeStrokes && index < BRUSH_STROKES; index += 1) {
+                    const partial = index < completeStrokes ? 1 : activeProgress;
+                    if (partial <= 0) continue;
+
+                    const row = index + 0.5;
+                    const baseY = top + row * rowHeight;
+                    const wave = Math.sin(index * 1.73) * rowHeight * 0.45;
+                    const direction = index % 2 === 0 ? 1 : -1;
+                    const startX = direction === 1 ? left - 24 : right + 24;
+                    const endX = direction === 1 ? right + 24 : left - 24;
+                    const pointAt = t => {
+                        const x = startX + (endX - startX) * t;
+                        const y = baseY + wave * Math.sin(t * Math.PI * 2) +
+                            Math.sin(t * Math.PI * 3 + index * 0.65) * rowHeight * 0.13;
+                        return { x, y };
+                    };
+
+                    ctx.beginPath();
+                    const samples = Math.max(2, Math.ceil(partial * 48));
+                    for (let sample = 0; sample <= samples; sample += 1) {
+                        const point = pointAt(partial * sample / samples);
+                        if (sample === 0) ctx.moveTo(point.x, point.y);
+                        else ctx.lineTo(point.x, point.y);
+                    }
+                    ctx.stroke();
+
+                    if (index === completeStrokes && partial < 1) {
+                        const tip = pointAt(partial);
+                        const shimmer = 0.72 + Math.sin(performance.now() * 0.012) * 0.18;
+                        ctx.save();
+                        ctx.globalAlpha *= shimmer;
+                        ctx.fillStyle = "#fff0d1";
+                        ctx.shadowColor = "#ff9baf";
+                        ctx.shadowBlur = 20;
+                        ctx.beginPath();
+                        ctx.arc(tip.x, tip.y, strokeWidth * 0.22, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+
+                traceHeart();
+                ctx.strokeStyle = "rgba(255, 129, 150, 0.2)";
+                ctx.lineWidth = 1;
+                ctx.shadowBlur = 0;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            function typeMessage(index, version) {
+                if (version !== typingVersion) return;
+                if (index < MESSAGE.length) {
+                    typingText.textContent += MESSAGE.charAt(index);
+                    typingTimer = window.setTimeout(() => typeMessage(index + 1, version), 36);
+                    return;
+                }
+                finalNote.classList.add("show");
+            }
+
+            function resetMessage() {
+                typingVersion += 1;
+                window.clearTimeout(typingTimer);
+                typingTimer = 0;
+                typingText.textContent = "";
+                title.style.opacity = "0";
+                messageSection.classList.remove("revealed");
+                finalNote.classList.remove("show");
+                portrait.style.opacity = "0";
+            }
+
+            function startMessage() {
+                if (typingText.textContent.length || title.style.opacity === "1") return;
+                messageSection.classList.add("revealed");
+                title.style.opacity = "1";
+                typeMessage(0, typingVersion);
+            }
+
+            function beginExplosion() {
+                if (explosionTriggered) return;
+                explosionTriggered = true;
+                particles.forEach(particle => particle.explode());
+            }
+
+            function render() {
+                if (!animationStarted) return;
+                const idle = !timelineStarted;
+                if (timelineStarted) {
+                    timelineFrame = audioFinished
+                        ? DURATION_FRAMES
+                        : Math.min(DURATION_FRAMES, audio.currentTime * 60);
+                }
+
+                ctx.clearRect(0, 0, sceneWidth, sceneHeight);
+                drawAmbientStars(timelineFrame);
+                if (timelineFrame >= FILL_START_FRAME && timelineFrame < EXPLOSION_FRAME) {
+                    const fillProgress = (timelineFrame - FILL_START_FRAME) /
+                        (EXPLOSION_FRAME - FILL_START_FRAME);
+                    drawCrimsonFill(Math.min(1, fillProgress));
+                } else if (timelineFrame >= EXPLOSION_FRAME) {
+                    const fillOpacity = Math.max(0, 1 - (timelineFrame - EXPLOSION_FRAME) / 90);
+                    drawCrimsonFill(1, fillOpacity);
+                }
+
+                particles.forEach(particle => {
+                    particle.update(timelineFrame, idle);
+                    particle.draw(timelineFrame);
+                });
+
+                if (timelineFrame >= HEART_START_FRAME && timelineFrame < EXPLOSION_FRAME) {
+                    drawHeartOutline();
+                }
+
+                if (timelineFrame >= EXPLOSION_FRAME) {
+                    beginExplosion();
+                    const imageProgress = Math.min(1,
+                        (timelineFrame - EXPLOSION_FRAME) / (MESSAGE_FRAME - EXPLOSION_FRAME));
+                    portrait.style.opacity = String(imageProgress);
+                }
+
+                if (timelineFrame >= MESSAGE_FRAME) startMessage();
+
+                if (timelineFrame >= DURATION_FRAMES) {
+                    typingVersion += 1;
+                    window.clearTimeout(typingTimer);
+                    typingText.textContent = MESSAGE;
+                    title.style.opacity = "1";
+                    messageSection.classList.add("revealed");
+                    finalNote.classList.add("show");
+                    portrait.style.opacity = "1";
+                    audioStatus.textContent = "";
+                    animationStarted = false;
+                    animationId = 0;
+                    return;
+                }
+
+                animationId = window.requestAnimationFrame(render);
+            }
+
+            function startAnimationLoop() {
+                if (animationId) window.cancelAnimationFrame(animationId);
+                animationStarted = true;
+                animationId = window.requestAnimationFrame(render);
+            }
+
+            async function startAudioPresentation() {
+                if (timelineStarted || audioStarting) return;
+                audioStarting = true;
+                audioStatus.textContent = "Starting music...";
+                try {
+                    audio.currentTime = 0;
+                    await audio.play();
+                    timelineFrame = 0;
+                    timelineStarted = true;
+                    audioFinished = false;
+                    introHint.classList.add("hidden");
+                    audioStatus.textContent = "";
+                    if (!animationStarted) startAnimationLoop();
+                } catch (error) {
+                    audioStatus.textContent = "Music could not start. Tap again to retry.";
+                    console.error("Unable to start the birthday audio:", error);
+                } finally {
+                    audioStarting = false;
+                }
+            }
+
+            function resetPresentation() {
+                if (animationId) window.cancelAnimationFrame(animationId);
+                animationId = 0;
+                animationStarted = false;
+                timelineStarted = false;
+                timelineFrame = 0;
+                explosionTriggered = false;
+                audioFinished = false;
+                resetMessage();
+                resizeCanvas();
+                createHeartPath();
+                initializeParticles();
+                audio.pause();
+                audio.currentTime = 0;
+                introHint.classList.remove("hidden");
+                audioStatus.textContent = "Tap anywhere to start the 63-second birthday presentation and music.";
+                startAnimationLoop();
+            }
+
+            audio.addEventListener("loadedmetadata", () => {
+                if (Number.isFinite(audio.duration) && Math.abs(audio.duration - DURATION_SECONDS) > 0.15) {
+                    audioStatus.textContent = `The music is ${audio.duration.toFixed(1)} seconds long; the presentation is 63 seconds.`;
+                }
+            });
+
+            audio.addEventListener("ended", () => {
+                if (timelineStarted) {
+                    audioFinished = true;
+                }
+            });
+
+            document.addEventListener("pointerdown", startAudioPresentation);
+            window.addEventListener("resize", resetPresentation, { passive: true });
+
+            resizeCanvas();
+            createHeartPath();
+            initializeParticles();
+            startAnimationLoop();
+        })();
+    </script>
+</body>
+</html>
